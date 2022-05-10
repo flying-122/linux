@@ -622,12 +622,6 @@ void rust_helper_mmget(struct mm_struct *mm)
 }
 EXPORT_SYMBOL_GPL(rust_helper_mmget);
 
-void rust_helper_mmput(struct mm_struct *mm)
-{
-	mmput(mm);
-}
-EXPORT_SYMBOL_GPL(rust_helper_mmput);
-
 /*
  * We use `bindgen`'s `--size_t-is-usize` option to bind the C `size_t` type
  * as the Rust `usize` type, so we can use it in contexts where Rust

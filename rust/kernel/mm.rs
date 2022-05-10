@@ -150,23 +150,28 @@ pub mod virt {
 }
 
 /// Wraps the kernel's `struct mm_struct`.
+///
+/// # Invariants
+///
+/// Instances of this type are always ref-counted, that is, a call to `mmget` ensures that the
+/// allocation remains valid at least until the matching call to `mmput`.
 #[repr(transparent)]
-pub struct MmStruct(pub(crate) UnsafeCell<bindings::mm_struct>);
+pub struct Mm(pub(crate) UnsafeCell<bindings::mm_struct>);
 
-impl MmStruct {
-    /// Creates a reference to a [`MmStruct`] from a valid pointer.
+impl Mm {
+    /// Creates a reference to a [`Mm`] from a valid pointer.
     ///
     /// # Safety
     ///
     /// The caller must ensure that `ptr` is valid and remains valid for the lifetime of the
-    /// returned [`MmStruct`] reference.
+    /// returned [`Mm`] reference.
     pub(crate) unsafe fn from_ptr<'a>(ptr: *const bindings::mm_struct) -> &'a Self {
         unsafe { &*ptr.cast() }
     }
 }
 
-// SAFETY: The type invariants guarantee that `MmStruct` is always ref-counted.
-unsafe impl AlwaysRefCounted for MmStruct {
+// SAFETY: The type invariants guarantee that `Mm` is always ref-counted.
+unsafe impl AlwaysRefCounted for Mm {
     fn inc_ref(&self) {
         // SAFETY: The existence of a shared reference means that the refcount is nonzero.
         unsafe { bindings::mmget(self.0.get()) };

@@ -4,7 +4,7 @@
 //!
 //! C header: [`include/linux/sched.h`](../../../../include/linux/sched.h).
 
-use crate::{bindings, mm::MmStruct};
+use crate::{bindings, mm::Mm};
 use core::{marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
 /// Wraps the kernel's `struct task_struct`.
@@ -97,9 +97,13 @@ impl Task {
     }
 
     /// Returns the Mm of the given task.
-    pub fn mm(&self) -> &MmStruct {
+    pub fn mm(&self) -> &Mm {
+        // SAFETY: By the type invariant, we know that `self.ptr` is non-null and valid.
         let ptr = unsafe { (*self.ptr).mm };
-        unsafe { MmStruct::from_ptr(ptr) }
+        // SAFETY: The lifetimes of `self` and `Mm` are tied, so it is guaranteed that
+        // the mm_struct pointer remains valid (because the task is still alive, and it doesn't
+        // change over the lifetime of a task).
+        unsafe { Mm::from_ptr(ptr) }
     }
 
     /// Determines whether the given task has pending signals.
