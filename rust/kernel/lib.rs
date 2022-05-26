@@ -15,7 +15,6 @@
 #![feature(allocator_api)]
 #![feature(associated_type_defaults)]
 #![feature(concat_idents)]
-#![feature(const_fn_trait_bound)]
 #![feature(const_mut_refs)]
 #![feature(const_ptr_offset_from)]
 #![feature(const_refs_to_cell)]
@@ -87,6 +86,7 @@ pub mod sync;
 pub mod sysctl;
 
 pub mod io_buffer;
+#[cfg(CONFIG_HAS_IOMEM)]
 pub mod io_mem;
 pub mod iov_iter;
 pub mod of;
